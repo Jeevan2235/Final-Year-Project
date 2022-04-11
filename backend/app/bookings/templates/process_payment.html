@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- Ensures optimal rendering on mobile devices -->
+    </head>
+
+    <body>
+        <!-- Set up a container element for the button -->
+        <div id="paypal-button-container"></div>
+
+        <!-- Include the PayPal JavaScript SDK -->
+        <script src="https://www.paypal.com/sdk/js?client-id=Aeo7N46suuI-PQBlWtP8ZQIpYJjiP_97r1dQiQtceBdmhnr9vT6j1JKNked2a1yqVhPQVsP6FhfJMwBJ&currency=USD"></script>
+
+        <input type="hidden" id="amt" name="variable" value="{{amount}}">
+        <script>
+            var myVar = document.getElementById("amt").value;
+
+            // Render the PayPal button into #paypal-button-container
+            paypal.Buttons({
+
+                // Set up the transaction
+                createOrder: function(data, actions) {
+                    return actions.order.create({
+                        purchase_units: [{
+                            amount: {
+                                value: myVar
+                            }
+                        }]
+                    });
+                },
+
+                // Finalize the transaction
+                onApprove: function(data, actions) {
+                    return actions.order.capture().then(function(orderData) {
+                        console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
+                        var transaction = orderData.purchase_units[0].payments.captures[0];
+                        alert('Transaction '+ transaction.status + ': ' + transaction.id);
+                    });
+                }
+            }).render('#paypal-button-container');
+        </script>
+    </body>
+</html>
