@@ -7,7 +7,7 @@ from djmoney.models.fields import MoneyField
 
 class Flight(models.Model):
     """Database model for flights"""
-    
+
     flight_number = models.CharField(max_length=10)
     baggage_limit = models.CharField(max_length=10)
     flight_time = models.CharField(max_length=10)
@@ -20,28 +20,53 @@ class Flight(models.Model):
 
 class Ticket(models.Model):
     """Database model for tickets in the system"""
-    
+
     ticket_class = models.CharField(max_length=10)
     seat_no = models.CharField(max_length=10)
     flight = models.ForeignKey(Flight, related_name="tickets", on_delete=models.CASCADE)
-    price = MoneyField(default=0.00, default_currency='USD', max_digits=14, decimal_places=2)
+    price_for_nepali = MoneyField(
+        default=0.00, default_currency="USD", max_digits=14, decimal_places=2
+    )
+    price_for_non_nepali = MoneyField(
+        default=0.00, default_currency="USD", max_digits=14, decimal_places=2
+    )
     booked = models.BooleanField(default=False)
     purchased = models.BooleanField(default=False)
     refundable = models.BooleanField(default=False)
-    
+
     def price_in_usd(self):
-        return self.price/Decimal(121)
+        return self.price / Decimal(121)
 
 
 def create_tickets_for_flight(sender, instance, created, *args, **kwargs):
     """function to send create tickets automatically for flight"""
-    
+
     if created:
         Ticket.objects.bulk_create(
-            [Ticket(ticket_class='A',seat_no=f"{i+1}",flight=instance,price="3200.00",refundable=False) for i in range(12)]
+            [
+                Ticket(
+                    ticket_class="A",
+                    seat_no=f"{i+1}",
+                    flight=instance,
+                    price_for_nepali="3200.00",
+                    price_for_non_nepali="4480.00",
+                    refundable=False,
+                )
+                for i in range(12)
+            ]
         )
         Ticket.objects.bulk_create(
-            [Ticket(ticket_class='B',seat_no=f"{i+1}",flight=instance,price="6400.00",refundable=True) for i in range(12)]
+            [
+                Ticket(
+                    ticket_class="B",
+                    seat_no=f"{i+1}",
+                    flight=instance,
+                    price_for_nepali="6400.00",
+                    price_for_non_nepali="8960.00",
+                    refundable=True,
+                )
+                for i in range(12)
+            ]
         )
 
 

@@ -29,5 +29,5 @@ router.register(
 urlpatterns = [
     path("", include(router.urls)),
     path("cancel-booking/<int:booking_id>/", viewset.CancelBookingView.as_view()),
-    path('process-payment/', viewset.process_payment, name='process_payment'),
+    path('process-payment/<int:purchase_id>/', viewset.process_payment, name='process_payment'),
 ]
